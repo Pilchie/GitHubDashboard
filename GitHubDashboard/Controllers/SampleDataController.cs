@@ -9,7 +9,7 @@ namespace GitHubDashboard.Controllers
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
-        private static string[] Summaries = new[]
+        private static string[] s_summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
@@ -22,7 +22,7 @@ namespace GitHubDashboard.Controllers
             {
                 DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
                 TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
+                Summary = s_summaries[rng.Next(s_summaries.Length)]
             });
         }
 
@@ -33,12 +33,7 @@ namespace GitHubDashboard.Controllers
             public string Summary { get; set; }
 
             public int TemperatureF
-            {
-                get
-                {
-                    return 32 + (int)(TemperatureC / 0.5556);
-                }
-            }
+                => 32 + (int)(TemperatureC / 0.5556);
         }
     }
 }
