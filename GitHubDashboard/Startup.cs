@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Octokit;
 
 namespace GitHubDashboard
 {
@@ -23,6 +24,12 @@ namespace GitHubDashboard
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            var client = new GitHubClient(new ProductHeaderValue("GitHubDashboard"))
+            {
+                Credentials = new Credentials(Configuration["GithubToken"])
+            };
+            services.AddSingleton(client);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
