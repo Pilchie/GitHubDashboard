@@ -19,7 +19,7 @@ export class QueryCountComponent {
         let owner: string = route.snapshot.params['owner'];
         let repo: string = route.snapshot.params['repo'];
         let milestone: string = route.snapshot.queryParams['milestone'];
-        http.get(baseUrl + `api/Query/Count/${owner}/${repo}/${milestone}`).subscribe(result => {
+        http.get(baseUrl + `api/Query/CountByMilestone/${owner}/${repo}/${milestone}`).subscribe(result => {
             let count = result.json() as number;
             this.result = new QueryCountResult(count, milestone);
         }, error => console.error(error));

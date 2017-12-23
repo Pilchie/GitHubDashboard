@@ -20,16 +20,25 @@ namespace GitHubDashboard.Controllers
         }
 
         [HttpGet("[action]/{owner}/{repository}/{milestone}")]
-        public async Task<int> Count(string owner, string repository, string milestone)
+        public async Task<int> CountByMilestone(string owner, string repository, string milestone)
         {
-            var milestonesClient = new MilestonesClient(new ApiConnection(_gitHubClient.Connection));
-            var milestoneRequest = new MilestoneRequest { State = ItemStateFilter.Open };
-            var milestones = await milestonesClient.GetAllForRepository(owner, repository, milestoneRequest);
-            var milestonesByName = milestones.ToDictionary(m => m.Title, m => m.Number);
+            if (string.IsNullOrWhiteSpace(milestone) ||
+                milestone == "any")
+            {
+                milestone = "*";
+            }
+            else if (milestone != "none")
+            {
+                var milestonesClient = new MilestonesClient(new ApiConnection(_gitHubClient.Connection));
+                var milestoneRequest = new MilestoneRequest { State = ItemStateFilter.Open };
+                var milestones = await milestonesClient.GetAllForRepository(owner, repository, milestoneRequest);
+                var milestonesByName = milestones.ToDictionary(m => m.Title, m => m.Number);
+                milestone = milestonesByName[milestone].ToString();
+            }
 
             var issueRequest = new RepositoryIssueRequest
             {
-                Milestone = milestonesByName[milestone].ToString(),
+                Milestone = milestone,
                 State = ItemStateFilter.Open,
             };
 
