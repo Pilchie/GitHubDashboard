@@ -1,7 +1,7 @@
 <p *ngIf="!result"><em>Loading...</em></p>
 
 <div *ngIf="result">
-    <h3>{{ result.milestone }} - Open</h3>
+    <p>{{ result.milestone }} - Open</p>
     <h1>
         <a href="https://github.com/{{result.owner}}/{{result.repo}}/issues?q=is%3Aissue+is%3Aopen+{{result.milestone_query}}" target="_blank">{{ result.count }}</a>
     </h1>
