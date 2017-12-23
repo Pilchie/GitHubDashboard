@@ -3,6 +3,6 @@
 <div *ngIf="result">
     <h3>Milestone: {{ result.milestone }}</h3>
     <h1>
-        {{ result.count }}
+        <a href="https://github.com/{{result.owner}}/{{result.repo}}/issues?q=is%3Aissue+is%3Aopen+{{result.milestone_query}}" target="_blank">{{ result.count }}</a>
     </h1>
 </div>
