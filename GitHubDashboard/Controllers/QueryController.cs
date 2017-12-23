@@ -19,21 +19,21 @@ namespace GitHubDashboard.Controllers
             _gitHubClient = gitHubClient;
         }
 
-        [HttpGet("[action]")]
-        public async Task<int> Count()
+        [HttpGet("[action]/{owner}/{repository}/{milestone}")]
+        public async Task<int> Count(string owner, string repository, string milestone)
         {
             var milestonesClient = new MilestonesClient(new ApiConnection(_gitHubClient.Connection));
             var milestoneRequest = new MilestoneRequest { State = ItemStateFilter.Open };
-            var milestones = await milestonesClient.GetAllForRepository("dotnet", "project-system", milestoneRequest);
+            var milestones = await milestonesClient.GetAllForRepository(owner, repository, milestoneRequest);
             var milestonesByName = milestones.ToDictionary(m => m.Title, m => m.Number);
 
             var issueRequest = new RepositoryIssueRequest
             {
-                Milestone = milestonesByName["15.6"].ToString(),
+                Milestone = milestonesByName[milestone].ToString(),
                 State = ItemStateFilter.Open,
             };
 
-            var issues = await _gitHubClient.Issue.GetAllForRepository("dotnet", "project-system", issueRequest);
+            var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
             var count = issues.Where(i => i.PullRequest == null).Count();
             return count;
         }

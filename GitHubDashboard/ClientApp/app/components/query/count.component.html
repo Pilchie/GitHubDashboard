@@ -1,5 +1,8 @@
-<p *ngIf="!count"><em>Loading...</em></p>
+<p *ngIf="!result"><em>Loading...</em></p>
 
-<h1 *ngIf="count">
-    {{ count }}
-</h1>
+<div *ngIf="result">
+    <h3>Milestone: {{ result.milestone }}</h3>
+    <h1 align="center">
+        {{ result.count }}
+    </h1>
+</div>
