@@ -4,7 +4,8 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 
 @Component({
     selector: 'count',
-    templateUrl: './count.component.html'
+    templateUrl: './count.component.html',
+    styleUrls: ['./count.component.css']
 })
 
 export class QueryCountComponent {

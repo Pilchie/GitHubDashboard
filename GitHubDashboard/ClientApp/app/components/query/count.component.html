@@ -1,8 +1,13 @@
-<p *ngIf="!result"><em>Loading...</em></p>
+<div style="background-color: rgb(0, 156, 204); color: white;">
+    <p *ngIf="!result"><em>Loading...</em></p>
 
-<div *ngIf="result">
-    <p>{{ result.milestone }} - Open</p>
-    <h1>
-        <a href="https://github.com/{{result.owner}}/{{result.repo}}/issues?q=is%3Aissue+is%3Aopen+{{result.milestone_query}}" target="_blank">{{ result.count }}</a>
-    </h1>
+    <div *ngIf="result">
+        <div class="title truncated-text-ellipsis">{{ result.milestone }} - Open</div>
+        <a href="https://github.com/{{result.owner}}/{{result.repo}}/issues?q=is%3Aissue+is%3Aopen+{{result.milestone_query}}" target="_blank">
+            <div class="big-count truncated-text-ellipsis" style="color: white;">
+                {{ result.count }}
+            </div>
+        </a>
+        <div class="truncated-text-ellipsis">Issues</div>
+    </div>
 </div>

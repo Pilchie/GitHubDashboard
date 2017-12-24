@@ -1,0 +1,20 @@
+﻿.big-count {
+    font-size: 72px;
+    line-height: 72px;
+    margin: 5px 0 10px 0;
+    font-weight: 300;
+}
+
+.title {
+    font-size: 16px;
+    margin: 0 0 10px 0;
+}
+
+.truncated-text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body {
+}
