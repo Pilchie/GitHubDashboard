@@ -1,7 +1,7 @@
-<div style="background-color: rgb(0, 156, 204); color: white;">
+<div>
     <p *ngIf="!result"><em>Loading...</em></p>
 
-    <div *ngIf="result">
+    <div *ngIf="result" class="count">
         <div class="title truncated-text-ellipsis">{{ result.milestone }} - Open</div>
         <a href="https://github.com/{{result.owner}}/{{result.repo}}/issues?q=is%3Aissue+is%3Aopen+{{result.milestone_query}}" target="_blank">
             <div class="big-count truncated-text-ellipsis" style="color: white;">
