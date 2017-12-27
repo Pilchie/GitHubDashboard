@@ -22,6 +22,38 @@ namespace GitHubDashboard.Controllers
         [HttpGet("[action]/{owner}/{repository}/{milestone}")]
         public async Task<int> CountByMilestone(string owner, string repository, string milestone)
         {
+            var issues = await GetIssuesAsync(owner, repository, milestone);
+            var count = issues.Where(i => i.PullRequest == null).Count();
+            return count;
+        }
+
+        [HttpGet("[action]/{owner}/{repository}/{milestone}")]
+        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone)
+        {
+            var issues = await GetIssuesAsync(owner, repository, milestone);
+            var counts = new Dictionary<string, int>();
+            foreach (var i in issues)
+            {
+                var login = i.Assignee?.Login ?? "(blank)";
+                if (counts.ContainsKey(login))
+                {
+                    counts[login]++;
+                }
+                else
+                {
+                    counts[login] = 1;
+                }
+            }
+
+            return new AssignedChartResult
+            {
+                milestone = milestone,
+                assignees = counts.Select(c => new AssigneeCount { assignee = c.Key, count = c.Value, }).ToArray(),
+            };
+        }
+
+        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone)
+        {
             if (string.IsNullOrWhiteSpace(milestone) ||
                 milestone == "any")
             {
@@ -43,8 +75,20 @@ namespace GitHubDashboard.Controllers
             };
 
             var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
-            var count = issues.Where(i => i.PullRequest == null).Count();
-            return count;
+            issues = issues.Where(i => i.PullRequest == null).ToList();
+            return issues;
         }
+    }
+
+    public class AssigneeCount
+    {
+        public string assignee;
+        public int count;
+    }
+
+    public class AssignedChartResult
+    {
+        public string milestone;
+        public AssigneeCount[] assignees;
     }
 }

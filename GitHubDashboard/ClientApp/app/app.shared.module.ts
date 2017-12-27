@@ -1,10 +1,11 @@
-import { NgModule } from '@angular/core';
+﻿import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
 import { CountModule } from './components/query/count.module';
+import { AssignedChartModule } from './components/assignedchart/assignedchart.module';
 
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
@@ -25,6 +26,7 @@ import { CounterComponent } from './components/counter/counter.component';
         HttpModule,
         FormsModule,
         CountModule,
+        AssignedChartModule,
         RouterModule.forRoot([
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'home', component: HomeComponent },
