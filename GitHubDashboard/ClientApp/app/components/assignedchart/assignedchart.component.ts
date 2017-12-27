@@ -9,7 +9,17 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 })
 
 export class AssignedChartComponent {
-    public result: AssignedChartResult;
+    public milestone: string;
+
+    public barChartOptions: any = {
+        scaleShowVerticalLines: false,
+        responsive: true
+    };
+    public barChartType: string = 'bar';
+    public barChartLegend: boolean = false;
+
+    public barChartLabels: string[];
+    public barChartData: any[];
 
     constructor(
         http: Http,
@@ -21,7 +31,10 @@ export class AssignedChartComponent {
         let repo: string = route.snapshot.params['repo'];
         let milestone: string = route.snapshot.queryParams['milestone'];
         http.get(baseUrl + `api/Query/AssignedChart/${owner}/${repo}/${milestone}`).subscribe(result => {
-            this.result = result.json() as AssignedChartResult;
+            let data = result.json() as AssignedChartResult;
+            this.barChartLabels = data.assignees.map(a => a.assignee);
+            this.barChartData = [{ data: data.assignees.map(a => a.count) }];
+            this.milestone = data.milestone;
         }, error => console.error(error));
     }
 }
