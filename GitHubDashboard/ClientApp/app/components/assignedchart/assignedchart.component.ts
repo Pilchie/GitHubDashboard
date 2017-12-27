@@ -15,7 +15,7 @@ export class AssignedChartComponent {
         scaleShowVerticalLines: false,
         responsive: true
     };
-    public barChartType: string = 'bar';
+    public barChartType: string = 'horizontalBar';
     public barChartLegend: boolean = false;
 
     public barChartLabels: string[];
