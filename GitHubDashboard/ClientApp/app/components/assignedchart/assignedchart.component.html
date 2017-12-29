@@ -3,13 +3,14 @@
 
     <div *ngIf="milestone" class="widget">
         <div class="title truncated-text-ellipsis">{{ milestone }} - By Assignee</div>
-        <div style="display: block">
+        <div style="display: block; position:relative; height: 90vh; width: 90vw">
             <canvas baseChart
                     [datasets]="barChartData"
                     [labels]="barChartLabels"
                     [options]="barChartOptions"
                     [legend]="barChartLegend"
-                    [chartType]="barChartType"></canvas>
+                    [chartType]="barChartType"
+                    [colors]="barChartColors"></canvas>
         </div>
     </div>
 </div>

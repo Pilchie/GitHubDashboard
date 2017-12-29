@@ -13,13 +13,15 @@ export class AssignedChartComponent {
 
     public barChartOptions: any = {
         scaleShowVerticalLines: false,
-        responsive: true
+        responsive: true,
+        maintainAspectRatio: false,
     };
     public barChartType: string = 'horizontalBar';
     public barChartLegend: boolean = false;
 
     public barChartLabels: string[];
     public barChartData: any[];
+    public barChartColors: any[] = [{ backgroundColor: "rgb(0, 156, 204)", hoverBackgroundColor: "rgb(0, 156, 204)", }];
 
     constructor(
         http: Http,
