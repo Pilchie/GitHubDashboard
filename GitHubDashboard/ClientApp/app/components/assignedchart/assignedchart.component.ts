@@ -15,6 +15,12 @@ export class AssignedChartComponent {
         scaleShowVerticalLines: false,
         responsive: true,
         maintainAspectRatio: false,
+        scales: {
+            yAxes: [{
+                barPercentage: 0.5,
+                categoryPercentage: 1.0,
+            }],
+        },
     };
     public barChartType: string = 'horizontalBar';
     public barChartLegend: boolean = false;
