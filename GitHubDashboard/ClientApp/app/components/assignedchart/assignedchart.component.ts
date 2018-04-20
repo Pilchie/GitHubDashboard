@@ -20,6 +20,11 @@ export class AssignedChartComponent {
                 barPercentage: 0.5,
                 categoryPercentage: 1.0,
             }],
+            xAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                },
+            }],
         },
     };
     public barChartType: string = 'horizontalBar';
