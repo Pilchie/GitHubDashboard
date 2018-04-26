@@ -19,18 +19,18 @@ namespace GitHubDashboard.Controllers
             _gitHubClient = gitHubClient;
         }
 
-        [HttpGet("[action]/{owner}/{repository}/{milestone}")]
-        public async Task<int> CountByMilestone(string owner, string repository, string milestone)
+        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
+        public async Task<int> CountByMilestone(string owner, string repository, string milestone, string labels)
         {
-            var issues = await GetIssuesAsync(owner, repository, milestone);
+            var issues = await GetIssuesAsync(owner, repository, milestone, labels);
             var count = issues.Where(i => i.PullRequest == null).Count();
             return count;
         }
 
-        [HttpGet("[action]/{owner}/{repository}/{milestone}")]
-        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone)
+        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
+        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone, string labels)
         {
-            var issues = await GetIssuesAsync(owner, repository, milestone);
+            var issues = await GetIssuesAsync(owner, repository, milestone, labels);
             var counts = new Dictionary<string, int>();
             foreach (var i in issues)
             {
@@ -47,15 +47,14 @@ namespace GitHubDashboard.Controllers
 
             return new AssignedChartResult
             {
-                milestone = milestone,
-                assignees = counts.Select(c => new AssigneeCount { assignee = c.Key, count = c.Value, }).OrderByDescending(a => a.count).ToArray(),
+                Milestone = milestone,
+                Assignees = counts.Select(c => new AssigneeCount { Assignee = c.Key, Count = c.Value, }).OrderByDescending(a => a.Count).ToArray(),
             };
         }
 
-        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone)
+        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels)
         {
-            if (string.IsNullOrWhiteSpace(milestone) ||
-                milestone == "any")
+            if (string.IsNullOrWhiteSpace(milestone) || milestone == "any" || milestone == "undefined" || milestone == "*")
             {
                 milestone = "*";
             }
@@ -74,21 +73,31 @@ namespace GitHubDashboard.Controllers
                 State = ItemStateFilter.Open,
             };
 
+            if (!string.IsNullOrWhiteSpace(labels) && !(labels == "undefined")) {
+                string[] labelvalues = labels.Split(',');
+                foreach (var label in labelvalues)
+                {
+                    issueRequest.Labels.Add(label);
+                }
+            }
+
             var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
             issues = issues.Where(i => i.PullRequest == null).ToList();
             return issues;
         }
     }
 
+
     public class AssigneeCount
     {
-        public string assignee;
-        public int count;
+        public string Assignee;
+        public int Count;
     }
+
 
     public class AssignedChartResult
     {
-        public string milestone;
-        public AssigneeCount[] assignees;
+        public string Milestone;
+        public AssigneeCount[] Assignees;
     }
 }
