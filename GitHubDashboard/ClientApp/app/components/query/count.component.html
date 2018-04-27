@@ -1,13 +1,15 @@
 <div>
     <p *ngIf="!result"><em>Loading...</em></p>
-
     <div *ngIf="result" class="count widget clickable">
         <a href="https://github.com/{{result.owner}}/{{result.repo}}/issues?q=is%3Aissue+is%3Aopen+{{result.query}}" target="_blank" style="color: white;">
-            <div class="title truncated-text-ellipsis">{{ result.milestone }} - Open</div>
+            <div class="title truncated-text-ellipsis">
+                <span *ngIf="result.milestone">{{result.milestone}} - </span>
+                <span *ngIf="result.labels">{{result.labels}}</span>
+            </div>
             <div class="big-count truncated-text-ellipsis">
                 {{ result.count }}
             </div>
-            <div class="truncated-text-ellipsis">Issues</div>
+            <div class="truncated-text-ellipsis">{{result.owner}}/{{result.repo}}</div>
         </a>
     </div>
 </div>

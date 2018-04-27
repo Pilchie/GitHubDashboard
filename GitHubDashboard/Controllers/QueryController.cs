@@ -54,7 +54,13 @@ namespace GitHubDashboard.Controllers
 
         private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels)
         {
-            if (string.IsNullOrWhiteSpace(milestone) || milestone == "any" || milestone == "undefined" || milestone == "*")
+            // "undefined" means that milestone was not set on the incoming URL.  Something
+            // like this:  http://<host>/count/nuget/home?label=VS1ES
+            if (string.IsNullOrWhiteSpace(milestone) || milestone == "undefined")
+            {
+                milestone = null;
+            }
+            else if (milestone == "any" || milestone == "*")
             {
                 milestone = "*";
             }
