@@ -47,8 +47,8 @@ namespace GitHubDashboard.Controllers
 
             return new AssignedChartResult
             {
-                Milestone = milestone,
-                Assignees = counts.Select(c => new AssigneeCount { Assignee = c.Key, Count = c.Value, }).OrderByDescending(a => a.Count).ToArray(),
+                milestone = milestone,
+                assignees = counts.Select(c => new AssigneeCount { assignee = c.Key, count = c.Value, }).OrderByDescending(a => a.count).ToArray(),
             };
         }
 
@@ -90,14 +90,14 @@ namespace GitHubDashboard.Controllers
 
     public class AssigneeCount
     {
-        public string Assignee;
-        public int Count;
+        public string assignee;
+        public int count;
     }
 
 
     public class AssignedChartResult
     {
-        public string Milestone;
-        public AssigneeCount[] Assignees;
+        public string milestone;
+        public AssigneeCount[] assignees;
     }
 }
