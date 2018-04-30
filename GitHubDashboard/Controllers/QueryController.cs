@@ -56,11 +56,7 @@ namespace GitHubDashboard.Controllers
         {
             // "undefined" means that milestone was not set on the incoming URL.  Something
             // like this:  http://<host>/count/nuget/home?label=VS1ES
-            if (string.IsNullOrWhiteSpace(milestone) || milestone == "undefined")
-            {
-                milestone = null;
-            }
-            else if (milestone == "any" || milestone == "*")
+            if (string.IsNullOrWhiteSpace(milestone) || milestone == "undefined" || milestone == "any" || milestone == "*")
             {
                 milestone = "*";
             }
