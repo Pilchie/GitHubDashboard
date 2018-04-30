@@ -54,9 +54,16 @@ namespace GitHubDashboard.Controllers
 
         private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels)
         {
-            // "undefined" means that milestone was not set on the incoming URL.  Something
-            // like this:  http://<host>/count/nuget/home?label=VS1ES
-            if (string.IsNullOrWhiteSpace(milestone) || milestone == "undefined" || milestone == "any" || milestone == "*")
+            // "undefined" means that milestone was not set on the incoming URL.  Something like this:
+            //          http://<host>/count/nuget/home?label=VS1ES
+            // Octokit treats milestone = '*' as "any set milestone" as opposed to "any milestone
+            // including no milestones."  So, if an issue had a label but no milestone setting, and query
+            // included "milestone = '*'" - Octokit (nor the website) would not return it.
+            if (string.IsNullOrWhiteSpace(milestone) || milestone == "undefined")
+            {
+                milestone = null;
+            }
+            else if (milestone == "any" || milestone == "*")
             {
                 milestone = "*";
             }
