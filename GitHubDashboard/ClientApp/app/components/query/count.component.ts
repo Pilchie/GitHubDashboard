@@ -35,8 +35,7 @@ class QueryCountResult {
         public repo: string,
         public count: number,
         public milestone: string,
-        public labels: string)
-    {
+        public labels: string) {
 
         if (milestone) {
             if (this.milestone == "none") {
