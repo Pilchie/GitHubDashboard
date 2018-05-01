@@ -52,17 +52,22 @@ namespace GitHubDashboard.Controllers
             };
         }
 
+
+        // The incoming param values come (ultimately) come from parsing the incoming URL in QueryCountComponent in
+        // count.component.ts.  The URLs could include milestones and/or labels.  Here, we have to translate the values
+        // to GitHub/Octokit to get the desired result set.  There are some quirks that need clarification below...
         private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels)
         {
-            // Map the incoming values from the URL to values that Octokit can process.  There are some quirks that need
-            // clarification.  "undefined" means that milestone was not set on the incoming URL.  Something like this:
-            //          http://<host>/count/nuget/home?label=VS1ES
-            // Map that value (and null/whitespace) to NULL in the Octokit issue request.  This tells Octokit "don't
-            // consider milestones in this query."  Then Octokit returns issues regardless of thier milestone setting -
-            // including issue with _no_ milestone setting.  Whereas, Octokit treats milestone = '*' as "any _set_ milestone."
-            // So Octokit would return all issues that have a milestone setting of any value - as long as at least one is set.
-            // However, with '*' it won't return issues that have NO milestone setting.  Finally, if the URL includes a milestone,
-            // use that...
+            // First, for milestone.  The URL might not have an milestone query parameter.  Something like this:
+            //    http://<host>/count/nuget/home?label=VS1ES
+            // In that case, the milestone parmeter will set to "undefined".  Map that value (and null/whitespace) to
+            // NULL in the Octokit issue request.  This tells Octokit "don't consider milestones in this query."  Then
+            // Octokit returns issues regardless of thier milestone setting - including issues with _no_ milestone setting.
+            // The URL could have "milestone='*'" - the milestone parameter will pass that value.  GitHub/Octokit treats
+            // milestone = '*' as "any _set_ milestone."  So Octokit would return all issues that have any milestone setting
+            // of any value - as long as the issue has one is set.  However, with '*' it won't return issues that have NO
+            // milestone setting.  Finally, if the URL includes a valid milestone (eg "milestone=15.8"), translate that string
+            // value into the corresponding milstone ID and put that in the issue request...
             if (string.IsNullOrWhiteSpace(milestone) || milestone == "undefined")
             {
                 milestone = null;
@@ -86,6 +91,11 @@ namespace GitHubDashboard.Controllers
                 State = ItemStateFilter.Open,
             };
 
+            // Second, for labels.  In GitHub, issues can have zero or more label values, and the incoming URL could specify a 
+            // query for multiple values.  Those URL values are passed to this function as a string of comma separated values.
+            // No values in the URL results in labels param value of "undefined" (same as above for milestone); A URL value of
+            // "label=test&label=VS1ES" results in "test,VS1ES" --> split those and add each value to the issue request
+            // Labels collection...
             if (!string.IsNullOrWhiteSpace(labels) && !(labels == "undefined")) {
                 string[] labelvalues = labels.Split(',');
                 foreach (var label in labelvalues)
