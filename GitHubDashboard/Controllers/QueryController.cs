@@ -115,7 +115,7 @@ namespace GitHubDashboard.Controllers
                 }
             }
 
-            // This could throw a validation error if the milestone doesn't exist in the repo.
+            // This could throw a validation exception if the milestone doesn't exist in the repo...
             var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
             issues = issues.Where(i => i.PullRequest == null).ToList();
             return issues;
