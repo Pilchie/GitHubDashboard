@@ -22,9 +22,20 @@ namespace GitHubDashboard.Controllers
         [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
         public async Task<int> CountByMilestone(string owner, string repository, string milestone, string labels)
         {
-            var issues = await GetIssuesAsync(owner, repository, milestone, labels);
-            var count = issues.Where(i => i.PullRequest == null).Count();
-            return count;
+            try
+            {
+                // GetIssuesAsync will throw if the milestone doesn't exist in the repo's list of milestones.
+                // Just return 0 issues.  Doesn't tell the user that the milestone doesn't exist (most helpful),
+                // but returning 0 issues matches GitHub site's behavior.  Returning 0 also renders a good URL
+                // that the user can click to go to the site for further debugging of the query...
+                var issues = await GetIssuesAsync(owner, repository, milestone, labels);
+                var count = issues.Where(i => i.PullRequest == null).Count();
+                return count;
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
@@ -104,6 +115,7 @@ namespace GitHubDashboard.Controllers
                 }
             }
 
+            // This could throw a validation error if the milestone doesn't exist in the repo.
             var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
             issues = issues.Where(i => i.PullRequest == null).ToList();
             return issues;
