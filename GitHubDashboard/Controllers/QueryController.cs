@@ -25,16 +25,24 @@ namespace GitHubDashboard.Controllers
             try
             {
                 // GetIssuesAsync will throw if the milestone doesn't exist in the repo's list of milestones.
-                // Just return 0 issues.  Doesn't tell the user that the milestone doesn't exist (most helpful),
+                // Could be a .NET KeyNotFoundException or an Octokit ApiValidationException.  Catch those and
+                // ust return 0 issues.  Doesn't tell the user that the milestone doesn't exist (most helpful),
                 // but returning 0 issues matches GitHub site's behavior.  Returning 0 also renders a good URL
                 // that the user can click to go to the site for further debugging of the query...
                 var issues = await GetIssuesAsync(owner, repository, milestone, labels);
                 var count = issues.Where(i => i.PullRequest == null).Count();
                 return count;
             }
-            catch
+            catch (Exception ex)
             {
-                return 0;
+                if (ex is KeyNotFoundException || ex is ApiValidationException)
+                {
+                    return 0;
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 
@@ -89,6 +97,8 @@ namespace GitHubDashboard.Controllers
             }
             else if (milestone != "none")
             {
+                // This throws a KeyNotFoundException if the incoming milestone value doesn't exist in the repo's collection
+                // of milestone values.  Catch it in the calling function...
                 var milestonesClient = new MilestonesClient(new ApiConnection(_gitHubClient.Connection));
                 var milestoneRequest = new MilestoneRequest { State = ItemStateFilter.Open };
                 var milestones = await milestonesClient.GetAllForRepository(owner, repository, milestoneRequest);
@@ -115,7 +125,8 @@ namespace GitHubDashboard.Controllers
                 }
             }
 
-            // This could throw a validation exception if the milestone doesn't exist in the repo...
+            // This could throw an ApiValidationException if the milestone doesn't exist in the repo.
+            // Catch it in the calling function...
             var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
             issues = issues.Where(i => i.PullRequest == null).ToList();
             return issues;
