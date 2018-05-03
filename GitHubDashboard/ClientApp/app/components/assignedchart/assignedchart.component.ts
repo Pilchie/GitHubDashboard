@@ -43,7 +43,8 @@ export class AssignedChartComponent {
         let owner: string = route.snapshot.params['owner'];
         let repo: string = route.snapshot.params['repo'];
         let milestone: string = route.snapshot.queryParams['milestone'];
-        http.get(baseUrl + `api/Query/AssignedChart/${owner}/${repo}/${milestone}`).subscribe(result => {
+        let labels: string = route.snapshot.queryParams['label'];
+        http.get(baseUrl + `api/Query/AssignedChart/${owner}/${repo}/${milestone}/${labels}`).subscribe(result => {
             let data = result.json() as AssignedChartResult;
             this.barChartLabels = data.assignees.map(a => a.assignee);
             this.barChartData = [{ data: data.assignees.map(a => a.count) }];
