@@ -97,7 +97,7 @@ namespace GitHubDashboard.Controllers
             // "label=test&label=VS1ES" results in "test,VS1ES" --> split those and add each value to the issue request
             // Labels collection...
             if (!string.IsNullOrWhiteSpace(labels) && !(labels == "undefined")) {
-                string[] labelvalues = labels.Split(',');
+                var labelvalues = labels.Split(',');
                 foreach (var label in labelvalues)
                 {
                     issueRequest.Labels.Add(label);
