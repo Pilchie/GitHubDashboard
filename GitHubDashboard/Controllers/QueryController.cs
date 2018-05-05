@@ -45,18 +45,17 @@ namespace GitHubDashboard.Controllers
                 }
             }
 
-            return new AssignedChartResult
-            {
-                milestone = milestone,
-                assignees = counts.Select(c => new AssigneeCount { assignee = c.Key, count = c.Value, }).OrderByDescending(a => a.count).ToArray(),
-            };
+            return new AssignedChartResult(
+                milestone: milestone,
+                assignees: counts.Select(c => new AssigneeCount(assignee: c.Key, count: c.Value)).OrderByDescending(a => a.count).ToArray()
+            );
         }
 
 
         // The incoming param values come (ultimately) come from parsing the incoming URL in QueryCountComponent in
         // count.component.ts.  The URLs could include milestones and/or labels.  Here, we have to translate the values
         // to GitHub/Octokit to get the desired result set.  There are some quirks that need clarification below...
-        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels)
+        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string? milestone, string labels)
         {
             // First, for milestone.  The URL handled by the Angular app might not have a milestone query parameter so it
             // would look something like this:
@@ -118,13 +117,25 @@ namespace GitHubDashboard.Controllers
 #pragma warning disable IDE1006
     public class AssigneeCount
     {
-        public string assignee;
-        public int count;
+        public AssigneeCount(string assignee, int count)
+        {
+            this.assignee = assignee;
+            this.count = count;
+        }
+
+        public readonly string assignee;
+        public readonly int count;
     }
 
 
     public class AssignedChartResult
     {
+        public AssignedChartResult(string milestone, AssigneeCount[] assignees)
+        {
+            this.milestone = milestone;
+            this.assignees = assignees;
+        }
+
         public string milestone;
         public AssigneeCount[] assignees;
     }
