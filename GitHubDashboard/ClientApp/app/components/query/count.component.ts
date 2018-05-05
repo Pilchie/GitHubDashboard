@@ -9,7 +9,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 })
 
 export class QueryCountComponent {
-    public result: QueryCountResult;
+    public result?: QueryCountResult;
 
     constructor(
         http: Http,
