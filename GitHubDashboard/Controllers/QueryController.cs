@@ -55,7 +55,7 @@ namespace GitHubDashboard.Controllers
         // The incoming param values come (ultimately) come from parsing the incoming URL in QueryCountComponent in
         // count.component.ts.  The URLs could include milestones and/or labels.  Here, we have to translate the values
         // to GitHub/Octokit to get the desired result set.  There are some quirks that need clarification below...
-        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string? milestone, string labels)
+        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels)
         {
             // First, for milestone.  The URL handled by the Angular app might not have a milestone query parameter so it
             // would look something like this:
