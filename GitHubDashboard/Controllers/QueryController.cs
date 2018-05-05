@@ -111,6 +111,8 @@ namespace GitHubDashboard.Controllers
     }
 
 
+    // Disable warnings about naming since these are designed to be used in json.
+#pragma warning disable IDE1006
     public class AssigneeCount
     {
         public string assignee;
@@ -123,4 +125,6 @@ namespace GitHubDashboard.Controllers
         public string milestone;
         public AssigneeCount[] assignees;
     }
+#pragma warning restore
+
 }
