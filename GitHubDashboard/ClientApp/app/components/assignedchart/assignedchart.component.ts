@@ -9,7 +9,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 })
 
 export class AssignedChartComponent {
-    public milestone: string;
+    public milestone?: string;
 
     public barChartOptions: any = {
         scaleShowVerticalLines: false,
@@ -30,8 +30,8 @@ export class AssignedChartComponent {
     public barChartType: string = 'horizontalBar';
     public barChartLegend: boolean = false;
 
-    public barChartLabels: string[];
-    public barChartData: any[];
+    public barChartLabels: (string | undefined)[] = [];
+    public barChartData?: any[];
     public barChartColors: any[] = [{ backgroundColor: "rgb(0, 156, 204)", hoverBackgroundColor: "rgb(0, 156, 204)", }];
 
     constructor(
@@ -46,19 +46,21 @@ export class AssignedChartComponent {
         let labels: string = route.snapshot.queryParams['label'];
         http.get(baseUrl + `api/Query/AssignedChart/${owner}/${repo}/${milestone}/${labels}`).subscribe(result => {
             let data = result.json() as AssignedChartResult;
-            this.barChartLabels = data.assignees.map(a => a.assignee);
-            this.barChartData = [{ data: data.assignees.map(a => a.count) }];
-            this.milestone = data.milestone;
+            if (data.assignees != null) {
+                this.barChartLabels = data.assignees.map(a => a.assignee);
+                this.barChartData = [{ data: data.assignees.map(a => a.count) }];
+            }
+            this.milestone = data.milestone == null ? "" : data.milestone;
         }, error => console.error(error));
     }
 }
 
 class AssigneeCount {
-    public assignee: string;
-    public count: number;
+    public assignee?: string;
+    public count?: number;
 }
 
 class AssignedChartResult {
-    public milestone: string;
-    public assignees: AssigneeCount[];
+    public milestone?: string;
+    public assignees?: AssigneeCount[];
 }
