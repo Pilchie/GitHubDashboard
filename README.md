@@ -1,4 +1,4 @@
-# What is it?
+## What is it?
 
 GitHub Dashboard is a simple service that renders basic HTML content about GitHub issues for display in tiles in a VSTS dashboard.  Currently the rendering displays the milestones and/or labels, the count of active issues, and the name of the owner and repo.  Though it's not shown, the content also embeds the GitHub URL so that clicking on the tile will jump to GitHub and show the query results in GitHub's UI.   You can see sample dashboards here:
 
@@ -10,12 +10,12 @@ In these dashboards, the tiles with white foreground pull information from the G
 <img src="./dashboard-tiles.jpg" style="border:3px solid Black; display: block; margin: auto;">
 <img src="./barchart.jpg" style="border:3px solid Black; display: block; margin: auto;">
 
-# Who can use the service?
+## Who can use the service?
 Any team in Visual Studio can power their GitHub dashboard content from this service.  You can read below about setting up your own dashboard that leverages the content from the service.
 
 If you're not in VS, contact [GitHub Dashboard Discussion](mailto:GitHubDash@microsoft.com) to fork the code and create a VSTS dashboard and service instance for your organization.
 
-# Create your own VSTS dashboard and tiles…
+## Create your own VSTS dashboard and tiles…
 Teams in Visual Studio can leverage the GitHub Dashboard service to render content on their team's VSTS dashboard.  Reach out to [GitHub Dashboard Discussion](mailto:GitHubDash@microsoft.com) to let us know of your dependency.  We'll add your contact info to the discussion DL so that you can stay aware of the 'goings on.'
 
 You can read about creating a VSTS dashboard here:  [Add and Manage Dashboards](https://docs.microsoft.com/en-us/vsts/report/dashboards/dashboards?view=vsts&tabs=new-query-exp).  Once you have a dashboard, you'll [add widgets](https://docs.microsoft.com/en-us/vsts/report/dashboards/add-widget-to-dashboard?view=vsts&tabs=new-query-exp) (like tiles) to it.  The Embedded Webpage widget will render the tiles as shown above.  To configure the tile, set the size, then set the URL property to the service's URL with a query string.  The service translates that URL/query string into a GitHub issue query to pull back the rendered content.  Here are two examples:
@@ -25,13 +25,13 @@ You can read about creating a VSTS dashboard here:  [Add and Manage Dashboards](
 	
 In the examples above, the base segment of the service's URL is https://githubdashboard-dev-as.azurewebsites.net/count.  Then, 'nuget' or 'dotnet' is the GitHub owner of the repo, and 'home' or 'project-system' is the GitHub repo name.  The query string is the typical form of a name-value pair.  Note that you can have multiple label values.  For instance, you might have a query string like this:  '…?milestone=15.8&label=test&label=bug'.  This is an 'and' so it will render issues with both labels.
 
-# What are the requirements for the service to access your repo?
+## What are the requirements for the service to access your repo?
 The obvious requirement is that the service account needs to have read-only access to your repo.
 
 How does my team contribute to the service?
 Thanks for your participation!  We prefer an 'open source' community approach for the service.  This way all teams can all leverage the community's new features and bug fixes.
 
-# Here's a rough outline of the steps to get you going:
+## Here's a rough outline of the steps to get you going:
 
 * Fork (or snap a copy) of the current service repo - < URL to central service repo >
 * Create a [personal access token for the command line](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/) - name the PAT 'GithubToken'.  The service on your dev box will leverage this PAT for read-only access to the repo.  Note that this is a personal access token - it signs in through your personal GitHub account - protect it appropriately.  Note that for 'dev box scenarios' your personal GitHub account will need at least read access to the repos you want to query.
@@ -51,9 +51,9 @@ Thanks for your participation!  We prefer an 'open source' community approach fo
 * If you don't know Angular, I found this to be a good tutorial on the basics:  https://angular.io/tutorial.
 * Also, if you need some help with attribute routing in ASP.NET Core, here's a good resource:  https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-2.0
 
-# Creating your own GitHub dashboard service…
+## Creating your own GitHub dashboard service…
 TBP...
 
-# I need more information, who do I contact?
+## I need more information, who do I contact?
 Reach out to [GitHub Dashboard Discussion](mailto:GitHubDash@microsoft.com) if something here is not clear or missing.
 
