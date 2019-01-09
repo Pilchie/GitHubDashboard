@@ -19,8 +19,8 @@ namespace GitHubDashboard.Controllers
             _gitHubClient = gitHubClient;
         }
 
-        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
-        public async Task<int> CountByMilestone(string owner, string repository, string milestone, string labels)
+        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}/{excludedLabels}")]
+        public async Task<int> CountByMilestone(string owner, string repository, string milestone, string labels, string excludedLabels)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace GitHubDashboard.Controllers
                 // ust return 0 issues.  Doesn't tell the user that the milestone doesn't exist (most helpful),
                 // but returning 0 issues matches GitHub site's behavior.  Returning 0 also renders a good URL
                 // that the user can click to go to the site for further debugging of the query...
-                var issues = await GetIssuesAsync(owner, repository, milestone, labels);
+                var issues = await GetIssuesAsync(owner, repository, milestone, labels, excludedLabels);
                 var count = issues.Where(i => i.PullRequest == null).Count();
                 return count;
             }
@@ -46,10 +46,10 @@ namespace GitHubDashboard.Controllers
             }
         }
 
-        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
-        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone, string labels)
+        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}/{excludedLabels}")]
+        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone, string labels, string excludedLabels)
         {
-            var issues = await GetIssuesAsync(owner, repository, milestone, labels);
+            var issues = await GetIssuesAsync(owner, repository, milestone, labels, excludedLabels);
             var counts = new Dictionary<string, int>();
             foreach (var i in issues)
             {
@@ -74,7 +74,7 @@ namespace GitHubDashboard.Controllers
         // The incoming param values come (ultimately) come from parsing the incoming URL in QueryCountComponent in
         // count.component.ts.  The URLs could include milestones and/or labels.  Here, we have to translate the values
         // to GitHub/Octokit to get the desired result set.  There are some quirks that need clarification below...
-        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels)
+        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels, string excludedLabels)
         {
             // First, for milestone.  The URL handled by the Angular app might not have a milestone query parameter so it
             // would look something like this:
@@ -132,6 +132,35 @@ namespace GitHubDashboard.Controllers
             // Catch it in the calling function...
             var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
             issues = issues.Where(i => i.PullRequest == null).ToList();
+
+            
+            // We now need to exclude all the issues that have labels that should be excluded
+            if(!String.IsNullOrEmpty(excludedLabels) && !(excludedLabels == "undefined"))
+            {
+                var filteredIssues = new List<Issue>();
+                var excludedLabelValues = excludedLabels.Split(',');               
+
+                foreach(Issue i in issues)
+                {
+                    bool skip = false;
+                    foreach(Label l in i.Labels)
+                    {
+                        if(excludedLabelValues.Contains(l.Name))
+                        {
+                            skip = true;
+                        }
+                    }
+
+                    if(!skip)
+                    {
+                        filteredIssues.Add(i);
+                    }
+                }
+
+                issues = filteredIssues;
+
+            }
+
             return issues;
         }
     }

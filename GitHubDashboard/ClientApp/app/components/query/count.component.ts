@@ -21,9 +21,10 @@ export class QueryCountComponent {
         let repo: string = route.snapshot.params['repo'];
         let milestone: string = route.snapshot.queryParams['milestone'];
         let labels: string = route.snapshot.queryParams['label'];
-        http.get(baseUrl + `api/Query/CountByMilestone/${owner}/${repo}/${milestone}/${labels}`).subscribe(result => {
+        let excludedLabels: string = route.snapshot.queryParams['-label'];
+        http.get(baseUrl + `api/Query/CountByMilestone/${owner}/${repo}/${milestone}/${labels}/${excludedLabels}`).subscribe(result => {
             let count = result.json() as number;
-            this.result = new QueryCountResult(owner, repo, count, milestone, labels);
+            this.result = new QueryCountResult(owner, repo, count, milestone, labels, excludedLabels);
         }, error => console.error(error));
     }
 }
@@ -35,7 +36,8 @@ class QueryCountResult {
         public repo: string,
         public count: number,
         public milestone: string,
-        public labels: string) {
+        public labels: string,
+        public excludedLabels:string) {
 
         if (milestone) {
             if (this.milestone == "none") {
@@ -49,6 +51,12 @@ class QueryCountResult {
         if (labels) {
             for (let label of labels.toString().split(",")) {
                 this.query += `label%3A${label} `;
+            }
+        }
+
+        if (excludedLabels) {
+            for (let label of excludedLabels.toString().split(",")) {
+                this.query += `-label%3A${label} `;
             }
         }
     }
