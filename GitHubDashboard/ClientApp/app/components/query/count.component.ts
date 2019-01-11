@@ -22,9 +22,10 @@ export class QueryCountComponent {
         let milestone: string = route.snapshot.queryParams['milestone'];
         let labels: string = route.snapshot.queryParams['label'];
         let excludedLabels: string = route.snapshot.queryParams['-label'];
-        http.get(baseUrl + `api/Query/CountByMilestone/${owner}/${repo}/${milestone}/${labels}/${excludedLabels}`).subscribe(result => {
+        let excludedMilestone: string = route.snapshot.queryParams['-milestone'];
+        http.get(baseUrl + `api/Query/CountByMilestone/${owner}/${repo}/${milestone}/${labels}/${excludedMilestone}/${excludedLabels}`).subscribe(result => {
             let count = result.json() as number;
-            this.result = new QueryCountResult(owner, repo, count, milestone, labels, excludedLabels);
+            this.result = new QueryCountResult(owner, repo, count, milestone, labels, excludedMilestone, excludedLabels);
         }, error => console.error(error));
     }
 }
@@ -37,6 +38,7 @@ class QueryCountResult {
         public count: number,
         public milestone: string,
         public labels: string,
+        public excludedMilestone: string,
         public excludedLabels:string) {
 
         if (milestone) {
@@ -44,7 +46,7 @@ class QueryCountResult {
                 this.query = "no%3Amilestone ";
             }
             else {
-                this.query = `milestone%3A${milestone} `;
+                this.query = `milestone%3A"${milestone}" `;
             }
         }
 
@@ -52,6 +54,11 @@ class QueryCountResult {
             for (let label of labels.toString().split(",")) {
                 this.query += `label%3A${label} `;
             }
+        }
+
+        if (excludedMilestone)
+        {
+            this.query = `-milestone%3A"${excludedMilestone}" `;
         }
 
         if (excludedLabels) {
