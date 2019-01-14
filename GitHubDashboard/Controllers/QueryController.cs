@@ -19,8 +19,8 @@ namespace GitHubDashboard.Controllers
             _gitHubClient = gitHubClient;
         }
 
-        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
-        public async Task<int> CountByMilestone(string owner, string repository, string milestone, string labels)
+        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}/{excludedMilestone}/{excludedLabels}")]
+        public async Task<int> CountByMilestone(string owner, string repository, string milestone, string labels, string excludedMilestone, string excludedLabels)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace GitHubDashboard.Controllers
                 // ust return 0 issues.  Doesn't tell the user that the milestone doesn't exist (most helpful),
                 // but returning 0 issues matches GitHub site's behavior.  Returning 0 also renders a good URL
                 // that the user can click to go to the site for further debugging of the query...
-                var issues = await GetIssuesAsync(owner, repository, milestone, labels);
+                var issues = await GetIssuesAsync(owner, repository, milestone, labels, excludedMilestone, excludedLabels);
                 var count = issues.Where(i => i.PullRequest == null).Count();
                 return count;
             }
@@ -46,10 +46,10 @@ namespace GitHubDashboard.Controllers
             }
         }
 
-        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
-        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone, string labels)
+        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}/{excludedLabels}")]
+        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone, string labels, string excludedMilestone, string excludedLabels)
         {
-            var issues = await GetIssuesAsync(owner, repository, milestone, labels);
+            var issues = await GetIssuesAsync(owner, repository, milestone, labels, excludedMilestone, excludedLabels);
             var counts = new Dictionary<string, int>();
             foreach (var i in issues)
             {
@@ -74,7 +74,7 @@ namespace GitHubDashboard.Controllers
         // The incoming param values come (ultimately) come from parsing the incoming URL in QueryCountComponent in
         // count.component.ts.  The URLs could include milestones and/or labels.  Here, we have to translate the values
         // to GitHub/Octokit to get the desired result set.  There are some quirks that need clarification below...
-        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels)
+        private async Task<IReadOnlyList<Issue>> GetIssuesAsync(string owner, string repository, string milestone, string labels, string excludedMilestone, string excludedLabels)
         {
             // First, for milestone.  The URL handled by the Angular app might not have a milestone query parameter so it
             // would look something like this:
@@ -120,7 +120,7 @@ namespace GitHubDashboard.Controllers
             // No values in the URL results in labels param value of "undefined" (same as above for milestone); A URL value of
             // "label=test&label=VS1ES" results in "test,VS1ES" --> split those and add each value to the issue request
             // Labels collection...
-            if (!string.IsNullOrWhiteSpace(labels) && !(labels == "undefined")) {
+            if (!string.IsNullOrWhiteSpace(labels) && (labels != "undefined")) {
                 var labelvalues = labels.Split(',');
                 foreach (var label in labelvalues)
                 {
@@ -130,9 +130,42 @@ namespace GitHubDashboard.Controllers
 
             // This could throw an ApiValidationException if the milestone doesn't exist in the repo.
             // Catch it in the calling function...
-            var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
-            issues = issues.Where(i => i.PullRequest == null).ToList();
-            return issues;
+            var allIssues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
+            var issues = allIssues.Where(i => i.PullRequest == null);
+
+            // We now need to exclude the milestone
+            if (!string.IsNullOrEmpty(excludedMilestone) && (excludedMilestone != "undefined"))
+            {
+                issues = issues.Where(i => i.Milestone == null || i.Milestone.Title != excludedMilestone);
+            }
+
+            // We now need to exclude all the issues that have labels that should be excluded
+            if (!string.IsNullOrEmpty(excludedLabels) && (excludedLabels != "undefined"))
+            {
+                var filteredIssues = new List<Issue>();
+                var excludedLabelValues = excludedLabels.Split(',');               
+
+                foreach (Issue i in issues)
+                {
+                    bool skip = false;
+                    foreach (Label l in i.Labels)
+                    {
+                        if (excludedLabelValues.Contains(l.Name))
+                        {
+                            skip = true;
+                        }
+                    }
+
+                    if (!skip)
+                    {
+                        filteredIssues.Add(i);
+                    }
+                }
+
+                issues = filteredIssues;
+            }
+        
+            return issues.ToList();
         }
     }
 

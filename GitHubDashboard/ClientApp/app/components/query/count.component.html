@@ -4,7 +4,9 @@
         <a href="https://github.com/{{result.owner}}/{{result.repo}}/issues?q=is%3Aissue+is%3Aopen+{{result.query}}" target="_blank" style="color: white;">
             <div class="title truncated-text-ellipsis">
                 <span *ngIf="result.milestone">{{result.milestone}} - </span>
+                <span *ngIf="result.excludedMilestone">!{{result.excludedMilestone}}</span>
                 <span *ngIf="result.labels">{{result.labels}}</span>
+                <span *ngIf="result.excludedLabels">!{{result.excludedLabels}}</span>
             </div>
             <div class="big-count truncated-text-ellipsis">
                 {{ result.count }}

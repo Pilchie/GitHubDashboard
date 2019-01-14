@@ -21,9 +21,11 @@ export class QueryCountComponent {
         let repo: string = route.snapshot.params['repo'];
         let milestone: string = route.snapshot.queryParams['milestone'];
         let labels: string = route.snapshot.queryParams['label'];
-        http.get(baseUrl + `api/Query/CountByMilestone/${owner}/${repo}/${milestone}/${labels}`).subscribe(result => {
+        let excludedLabels: string = route.snapshot.queryParams['-label'];
+        let excludedMilestone: string = route.snapshot.queryParams['-milestone'];
+        http.get(baseUrl + `api/Query/CountByMilestone/${owner}/${repo}/${milestone}/${labels}/${excludedMilestone}/${excludedLabels}`).subscribe(result => {
             let count = result.json() as number;
-            this.result = new QueryCountResult(owner, repo, count, milestone, labels);
+            this.result = new QueryCountResult(owner, repo, count, milestone, labels, excludedMilestone, excludedLabels);
         }, error => console.error(error));
     }
 }
@@ -35,20 +37,32 @@ class QueryCountResult {
         public repo: string,
         public count: number,
         public milestone: string,
-        public labels: string) {
+        public labels: string,
+        public excludedMilestone: string,
+        public excludedLabels:string) {
 
         if (milestone) {
             if (this.milestone == "none") {
                 this.query = "no%3Amilestone ";
             }
             else {
-                this.query = `milestone%3A${milestone} `;
+                this.query = `milestone%3A"${milestone}" `;
             }
         }
 
         if (labels) {
             for (let label of labels.toString().split(",")) {
-                this.query += `label%3A${label} `;
+                this.query += `label%3A"${label}" `;
+            }
+        }
+
+        if (excludedMilestone) {
+            this.query = `-milestone%3A"${excludedMilestone}" `;
+        }
+
+        if (excludedLabels) {
+            for (let label of excludedLabels.toString().split(",")) {
+                this.query += `-label%3A"${label}" `;
             }
         }
     }
