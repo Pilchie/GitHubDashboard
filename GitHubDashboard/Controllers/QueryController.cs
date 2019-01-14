@@ -120,7 +120,7 @@ namespace GitHubDashboard.Controllers
             // No values in the URL results in labels param value of "undefined" (same as above for milestone); A URL value of
             // "label=test&label=VS1ES" results in "test,VS1ES" --> split those and add each value to the issue request
             // Labels collection...
-            if (!string.IsNullOrWhiteSpace(labels) && !(labels == "undefined")) {
+            if (!string.IsNullOrWhiteSpace(labels) && (labels != "undefined")) {
                 var labelvalues = labels.Split(',');
                 foreach (var label in labelvalues)
                 {
@@ -130,33 +130,33 @@ namespace GitHubDashboard.Controllers
 
             // This could throw an ApiValidationException if the milestone doesn't exist in the repo.
             // Catch it in the calling function...
-            var issues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
-            issues = issues.Where(i => i.PullRequest == null).ToList();
+            var allIssues = await _gitHubClient.Issue.GetAllForRepository(owner, repository, issueRequest);
+            var issues = allIssues.Where(i => i.PullRequest == null);
 
             // We now need to exclude the milestone
-            if (!String.IsNullOrEmpty(excludedMilestone) && !(excludedMilestone == "undefined"))
+            if (!string.IsNullOrEmpty(excludedMilestone) && (excludedMilestone != "undefined"))
             {
-                issues = issues.Where(i => i.Milestone == null || i.Milestone.Title != excludedMilestone).ToList();
+                issues = issues.Where(i => i.Milestone == null || i.Milestone.Title != excludedMilestone);
             }
 
             // We now need to exclude all the issues that have labels that should be excluded
-            if (!String.IsNullOrEmpty(excludedLabels) && !(excludedLabels == "undefined"))
+            if (!string.IsNullOrEmpty(excludedLabels) && (excludedLabels != "undefined"))
             {
                 var filteredIssues = new List<Issue>();
                 var excludedLabelValues = excludedLabels.Split(',');               
 
-                foreach(Issue i in issues)
+                foreach (Issue i in issues)
                 {
                     bool skip = false;
-                    foreach(Label l in i.Labels)
+                    foreach (Label l in i.Labels)
                     {
-                        if(excludedLabelValues.Contains(l.Name))
+                        if (excludedLabelValues.Contains(l.Name))
                         {
                             skip = true;
                         }
                     }
 
-                    if(!skip)
+                    if (!skip)
                     {
                         filteredIssues.Add(i);
                     }
@@ -165,7 +165,7 @@ namespace GitHubDashboard.Controllers
                 issues = filteredIssues;
             }
         
-            return issues;
+            return issues.ToList();
         }
     }
 

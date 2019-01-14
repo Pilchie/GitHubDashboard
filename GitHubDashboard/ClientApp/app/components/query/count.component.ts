@@ -52,18 +52,17 @@ class QueryCountResult {
 
         if (labels) {
             for (let label of labels.toString().split(",")) {
-                this.query += `label%3A${label} `;
+                this.query += `label%3A"${label}" `;
             }
         }
 
-        if (excludedMilestone)
-        {
+        if (excludedMilestone) {
             this.query = `-milestone%3A"${excludedMilestone}" `;
         }
 
         if (excludedLabels) {
             for (let label of excludedLabels.toString().split(",")) {
-                this.query += `-label%3A${label} `;
+                this.query += `-label%3A"${label}" `;
             }
         }
     }
