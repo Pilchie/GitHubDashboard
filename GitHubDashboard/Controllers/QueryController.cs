@@ -46,10 +46,17 @@ namespace GitHubDashboard.Controllers
             }
         }
 
-        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}/{excludedLabels}")]
-        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone, string labels, string excludedMilestone, string excludedLabels)
+        [HttpGet("[action]/{owner}/{repository}/{milestone}/{labels}")]
+        public async Task<AssignedChartResult> AssignedChart(string owner, string repository, string milestone, string labels)
         {
-            var issues = await GetIssuesAsync(owner, repository, milestone, labels, excludedMilestone, excludedLabels);
+            var issues = await GetIssuesAsync(
+                owner,
+                repository,
+                milestone,
+                labels,
+                excludedMilestone: "undefined",
+                excludedLabels: "undefined");
+
             var counts = new Dictionary<string, int>();
             foreach (var i in issues)
             {
